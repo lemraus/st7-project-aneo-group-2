@@ -1,0 +1,68 @@
+{
+    "nodes": {
+        "0": {
+            "data": "01:00:00",
+            "dependencies": []
+        },
+        "1": {
+            "data": "01:00:00",
+            "dependencies": [0]
+        },
+        "2": {
+            "data": "01:00:00",
+            "dependencies": [0]
+        },
+        "3": {
+            "data": "01:00:00",
+            "dependencies": [0]
+        },
+        "4": {
+            "data": "01:00:00",
+            "dependencies": [1]
+        },
+        "5": {
+            "data": "01:00:00",
+            "dependencies": [1]
+        },
+        "6": {
+            "data": "01:00:00",
+            "dependencies": [2]
+        },
+        "7": {
+            "data": "01:00:00",
+            "dependencies": [2]
+        },
+        "8": {
+            "data": "01:00:00",
+            "dependencies": [3]
+        },
+        "9": {
+            "data": "01:00:00",
+            "dependencies": [3]
+        },
+        "10": {
+            "data": "01:00:00",
+            "dependencies": [4, 5]
+        },
+        "11": {
+            "data": "01:00:00",
+            "dependencies": [5, 6]
+        },
+        "12": {
+            "data": "01:00:00",
+            "dependencies": [6, 7]
+        },
+        "13": {
+            "data": "01:00:00",
+            "dependencies": [7, 8]
+        },
+        "14": {
+            "data": "01:00:00",
+            "dependencies": [8, 9]
+        },
+        "15": {
+            "data": "01:00:00",
+            "dependencies": [10, 11, 12, 13, 14]
+        }
+    }
+}
