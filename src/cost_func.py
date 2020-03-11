@@ -21,14 +21,15 @@ def cost_func(array, graph):
         finishing_time = starting_time + duration
         time_machine[machine] = finishing_time
         time_task[task] = finishing_time
-        if last_task_ending_time == 0 and starting_time < BOOTING_TIME: # We have to boot the machine
+        if last_task_ending_time == 0: # First task of the machine
+            total_cost += COST*(BOOTING_TIME + duration)
+            if starting_time < BOOTING_TIME: # We have to boot the machine
             time_machine[machine] += BOOTING_TIME
             time_task[task] += BOOTING_TIME
-            total_cost += COST*(BOOTING_TIME + duration)
         elif starting_time - last_task_ending_time > BOOTING_TIME: # We have to reboot the machine
             total_cost += COST*(BOOTING_TIME + duration)
         else: # The machine stays on
-            total_cost += COST*(last_task_ending_time + finishing_time)
+            total_cost += COST*(finishing_time - last_task_ending_time)
         print(f'Tâche {task}: coût de {total_cost}.')
     
     return (total_cost, max(time_machine))
