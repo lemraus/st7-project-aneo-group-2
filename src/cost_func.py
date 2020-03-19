@@ -24,8 +24,8 @@ def cost_func(array, graph):
         if last_task_ending_time == 0: # First task of the machine
             total_cost += COST*(BOOTING_TIME + duration)
             if starting_time < BOOTING_TIME: # We have to boot the machine
-            time_machine[machine] += BOOTING_TIME
-            time_task[task] += BOOTING_TIME
+                time_machine[machine] += BOOTING_TIME
+                time_task[task] += BOOTING_TIME
         elif starting_time - last_task_ending_time > BOOTING_TIME: # We have to reboot the machine
             total_cost += COST*(BOOTING_TIME + duration)
         else: # The machine stays on
