@@ -6,3 +6,10 @@ To install the required libraries in your local environment, enter this command 
 ```bash
 pip install -r requirements.txt
 ```
+
+## Exporting dependencies
+
+To export the dependencies in the requirements.txt file, execute this command in your terminal:
+```bash
+pip freeze > requirements.txt
+```
