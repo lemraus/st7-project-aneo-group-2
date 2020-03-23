@@ -22,7 +22,7 @@ def makeGraph(name):
 
     return G
 
-def scheduler(nb_machines, name):
+def scheduler(name, nb_machines):
     G = makeGraph(name)
     bfs = nx.bfs_edges(G, "1")
     schedule = [("1", "0")]
@@ -33,6 +33,13 @@ def scheduler(nb_machines, name):
 
     return schedule
 
+
+def init_generation(name, nb_chrm, max_machine):
+    generation = []
+    for i in range(nb_chrm):
+        generation.append(scheduler(name, i % max_machine + 1))
+    return generation
+
 # The bfs algorithm is bfs_edges(G, source)
 
 # nx.draw_kamada_kawai(G, with_labels = True)
@@ -41,4 +48,7 @@ def scheduler(nb_machines, name):
 
 # Pour tester:
 if __name__ == "__main__":
-    print(scheduler(5, "mediumRandom"))
+    # print(scheduler("mediumRandom", 5))
+    gen = init_generation("mediumRandom", 100, 10)
+    for chr in gen:
+        print(chr)
