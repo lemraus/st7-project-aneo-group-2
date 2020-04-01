@@ -15,12 +15,12 @@ def jsonDataFile(name):
 
 def main():
     G = nx.DiGraph()
-    with open(jsonDataFile("smallComplex")) as jsonFile:
-        dataDict = json.load(jsonFile)
-        for key, value in dataDict["nodes"].items():
+    with open(json_data_file("smallComplex")) as json_file:
+        data_dict = json.load(json_file)
+        for key, value in data_dict["nodes"].items():
             G.add_node(key, data=value["Data"])
-            for otherKey in value["Dependencies"]:
-                G.add_edge(str(otherKey), key)
+            for other_key in value["Dependencies"]:
+                G.add_edge(str(other_key), key)
 
     print(f"Longest path: {nx.algorithms.dag.dag_longest_path(G)}")
     print(f"Length of the longest path: {nx.algorithms.dag.dag_longest_path_length(G)}")
