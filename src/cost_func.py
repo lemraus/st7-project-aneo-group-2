@@ -22,7 +22,6 @@ def cost_func(array, graph):
                                 time_task[int(key)])  # task cannot start while its dependencies are not finished
         finishing_time = starting_time + duration
         time_machine[machine] = finishing_time
-        print(task)
         time_task[int(task)] = finishing_time
         if last_task_ending_time == 0:  # First task of the machine
             total_cost += COST * (BOOTING_TIME + duration)
