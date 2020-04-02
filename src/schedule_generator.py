@@ -33,10 +33,10 @@ def makeGraph(name):
 
 def scheduler(nb_machines, graph):
     bfs = nx.bfs_edges(graph, "0")
-    schedule = [("0", 0)]
+    schedule = [["0", 0]]
     i = 1
     for (parent, child) in bfs:
-        schedule.append((child, i % nb_machines))
+        schedule.append([child, i % nb_machines])
         i += 1
 
     return schedule

@@ -1,6 +1,7 @@
 from deap import creator, base
 
-from src.cost_func import cost_func
+from src.crossover import crossover_in_place as mate
+from src.mutate import mutate_in_place as mutate
 from src.schedule_generator import init_generation, makeGraph
 
 # Creating abstract fitness function, with two objective minimizer
@@ -11,6 +12,8 @@ creator.create("Individual", list, fitness=creator.FitnessMin)
 
 # Initializing variables
 NB_POP, MAX_MACH = 10, 10
+MACHINES_MUTATION_PROBABILITY = 0.2
+MUTATION_PROBABILITY = 0.1
 
 # Let us build the graph only once in order to save time
 graph_name = "smallRandom"
@@ -38,7 +41,15 @@ toolbox = base.Toolbox()
 
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
-
+toolbox.register("mutate", mutate, MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY)
+toolbox.register("mate", mate)
 population = toolbox.population_guess()
 
-print(cost_func(population[1], task_graph))
+
+# Test
+ind1, ind2 = population[0], population[9]
+
+for i in range(20):
+    child1, child2 = [toolbox.clone(ind) for ind in (ind1, ind2)]
+    toolbox.mate(child1, child2)
+    print(f"{i} child1", child1,"\n", " child2", child2)
