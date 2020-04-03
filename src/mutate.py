@@ -27,8 +27,7 @@ from random import random, randint
 #
 
 
-
-def mutate_in_place(chromosome, MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY):
+def mutate_in_place(MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY, chromosome):
     max_machines = max(map(lambda x: x[1], chromosome))
 
     # If we apply this mutation then we either gain a machine or lose one.
