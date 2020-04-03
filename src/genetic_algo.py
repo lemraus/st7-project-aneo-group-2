@@ -1,5 +1,7 @@
 import random
 
+import matplotlib.pyplot as plt
+import numpy
 from deap import creator, base, tools
 
 from src.cost_func import cost_func as evaluate
@@ -19,7 +21,7 @@ MACHINES_MUTATION_PROBABILITY = 0.2
 MUTATION_PROBABILITY = 0.1
 CXPB = 0.5
 MUTPB = 0.5
-NGEN = 10
+NGEN = 100
 
 # Let us build the graph only once in order to save time
 graph_name = "mediumRandom"
@@ -43,15 +45,27 @@ def initPopulation(pcls, ind_init, filename):
     return pcls(ind_init(c) for c in contents)
 
 
+# Creating and registering toolbox
 toolbox = base.Toolbox()
-
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
 toolbox.register("evaluate", evaluate, task_graph)
 toolbox.register("select", tools.selTournament, tournsize=3)
+
+# Creating and registering stats
+stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+stats.register("avg", numpy.mean)
+stats.register("std", numpy.std)
+stats.register("min", numpy.min)
+stats.register("max", numpy.max)
+
+# Creating the population
 pop = toolbox.population_guess()
+
+# Creating a logbook for recording statistics
+logbook = tools.Logbook()
 
 # To the heart of the genetic algorithm
 
@@ -82,3 +96,35 @@ for g in range(NGEN):
 
     # The population is entirely replaced by the offspring
     pop[:] = offspring
+
+    # Recording statistics
+    record = stats.compile(pop)
+    logbook.record(gen=g, evals=len(invalid_ind), **record)
+
+# logbook.header = "gen", "evals", "avg", "min", "max"
+# print(logbook)
+
+gen = logbook.select("gen")
+fit_mins = logbook.select("min")
+# size_avgs = logbook.chapters["size"].select("avg")
+
+
+
+fig, ax1 = plt.subplots()
+line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Fitness")
+ax1.set_xlabel("Generation")
+ax1.set_ylabel("Fitness", color="b")
+for tl in ax1.get_yticklabels():
+    tl.set_color("b")
+
+# ax2 = ax1.twinx()
+# line2 = ax2.plot(gen, size_avgs, "r-", label="Average Size")
+# ax2.set_ylabel("Size", color="r")
+# for tl in ax2.get_yticklabels():
+#     tl.set_color("r")
+
+lns = line1  # + line2
+labs = [l.get_label() for l in lns]
+ax1.legend(lns, labs, loc="center right")
+
+plt.show()
