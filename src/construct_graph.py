@@ -8,7 +8,7 @@ DATA_DIR = os.path.join(SRC_DIR, "data")
 
 def parse_time(string):
     temp = string.split(':')
-    return 3600*int(temp[0]) + 60*int(temp[1]) + int(temp[2])
+    return 3600*int(temp[0]) + 60*int(temp[1]) + float(temp[2])
 
 def json_data_file(name):
     return os.path.join(DATA_DIR, f"{name}.json")
