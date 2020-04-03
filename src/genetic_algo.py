@@ -16,12 +16,12 @@ creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
 # Initializing variables
-NB_POP, MAX_MACH = 10, 10
+NB_POP, MAX_MACH = 50, 50
 MACHINES_MUTATION_PROBABILITY = 0.2
 MUTATION_PROBABILITY = 0.1
 CXPB = 0.5
 MUTPB = 0.5
-NGEN = 100
+NGEN = 20
 
 # Let us build the graph only once in order to save time
 graph_name = "mediumRandom"
@@ -55,11 +55,15 @@ toolbox.register("evaluate", evaluate, task_graph)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 # Creating and registering stats
-stats = tools.Statistics(key=lambda ind: ind.fitness.values)
-stats.register("avg", numpy.mean)
-stats.register("std", numpy.std)
-stats.register("min", numpy.min)
-stats.register("max", numpy.max)
+stats_cost = tools.Statistics(key=lambda ind: ind.fitness.values[0])
+
+stats_dur = tools.Statistics(key=lambda ind: ind.fitness.values[1])
+
+mstats = tools.MultiStatistics(cost=stats_cost, duration=stats_dur)
+mstats.register("min", numpy.min)
+mstats.register("avg", numpy.average)
+mstats.register("max", numpy.max)
+
 
 # Creating the population
 pop = toolbox.population_guess()
@@ -98,32 +102,34 @@ for g in range(NGEN):
     pop[:] = offspring
 
     # Recording statistics
-    record = stats.compile(pop)
+    record = mstats.compile(pop)
     logbook.record(gen=g, evals=len(invalid_ind), **record)
 
 # logbook.header = "gen", "evals", "avg", "min", "max"
 # print(logbook)
 
 gen = logbook.select("gen")
-fit_mins = logbook.select("min")
-# size_avgs = logbook.chapters["size"].select("avg")
-
-
+fit_mins = logbook.chapters["cost"].select("min")
+duration_mins = logbook.chapters["duration"].select("min")
+duration_maxs = logbook.chapters["duration"].select("max")
+fit_avg = logbook.chapters["cost"].select("avg")
 
 fig, ax1 = plt.subplots()
-line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Fitness")
+line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Cost")
+line3 = ax1.plot(gen, fit_avg, "g-", label= "Average Cost")
 ax1.set_xlabel("Generation")
-ax1.set_ylabel("Fitness", color="b")
+ax1.set_ylabel("Cost", color="b")
 for tl in ax1.get_yticklabels():
     tl.set_color("b")
 
-# ax2 = ax1.twinx()
-# line2 = ax2.plot(gen, size_avgs, "r-", label="Average Size")
-# ax2.set_ylabel("Size", color="r")
-# for tl in ax2.get_yticklabels():
-#     tl.set_color("r")
+ax2 = ax1.twinx()
+line2 = ax2.plot(gen, duration_mins, "r-", label="Minimum Duration")
+line4 = ax2.plot(gen, duration_maxs, "y-", label="Maximum Duration")
+ax2.set_ylabel("Duration", color="r")
+for tl in ax2.get_yticklabels():
+    tl.set_color("r")
 
-lns = line1  # + line2
+lns = line1 + line2 + line3 + line4
 labs = [l.get_label() for l in lns]
 ax1.legend(lns, labs, loc="center right")
 
