@@ -20,14 +20,22 @@ def main():
     with open(json_data_file("smallComplex")) as json_file:
         data_dict = json.load(json_file)
         for key, value in data_dict["nodes"].items():
-            keys_indexes[key] = current_index
-            G.add_node(current_index, data=parse_time(value["Data"]))
+            try:
+                G.add_node(keys_indexes[key], data=parse_time(value["Data"]))
+            except:
+                keys_indexes[key] = current_index
+                G.add_node(current_index, data=parse_time(value["Data"]))
+                current_index += 1
             for other_key in value["Dependencies"]:
-                G.add_edge(keys_indexes[str(other_key)], current_index)
-            current_index += 1
+                try:
+                    G.add_edge(keys_indexes[str(other_key)], current_index)
+                except:
+                    G.add_edge(current_index, keys_indexes[key])
+                    keys_indexes[other_key] = current_index
+                    current_index += 1
 
     print(f"Longest path: {nx.algorithms.dag.dag_longest_path(G)}")
     print(f"Length of the longest path: {nx.algorithms.dag.dag_longest_path_length(G)}")
 
 if __name__ == "__main__":
-    main()
+    G = main()
