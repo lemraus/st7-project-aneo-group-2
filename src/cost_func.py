@@ -3,9 +3,9 @@ def cost_func(graph, array):
 
     # Params
     COST = 0.1  # Cost per second
-    BOOTING_TIME = 10
+    BOOTING_TIME = 20
     PENALTY_MULTIPLIER = 2
-    MAXIMUM_DURATION = 3 * 60 * 60  # TODO : must bring this down depending on the graph!
+    MAXIMUM_DURATION = 2000000  # TODO : must bring this down depending on the graph!
 
     # Array of finishing times of the last task of a given machine
     time_machine = [0] * len(array)
