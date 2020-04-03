@@ -3,11 +3,12 @@ import random
 import matplotlib.pyplot as plt
 import numpy
 from deap import creator, base, tools
+from scoop import futures
 
-from src.cost_func import cost_func as evaluate
-from src.crossover import crossover_in_place as mate
-from src.mutate import mutate_in_place as mutate
-from src.schedule_generator import init_generation, makeGraph
+from cost_func import cost_func as evaluate
+from crossover import crossover_in_place as mate
+from mutate import mutate_in_place as mutate
+from schedule_generator import init_generation, makeGraph
 
 # Creating abstract fitness function, with two objective minimizer
 creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
@@ -47,6 +48,7 @@ def initPopulation(pcls, ind_init, filename):
 
 # Creating and registering toolbox
 toolbox = base.Toolbox()
+toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY)
@@ -64,73 +66,76 @@ mstats.register("min", numpy.min)
 mstats.register("avg", numpy.average)
 mstats.register("max", numpy.max)
 
+def genetic_algo():
+    # Creating the population
+    pop = toolbox.population_guess()
 
-# Creating the population
-pop = toolbox.population_guess()
+    # Creating a logbook for recording statistics
+    logbook = tools.Logbook()
 
-# Creating a logbook for recording statistics
-logbook = tools.Logbook()
+    # To the heart of the genetic algorithm
 
-# To the heart of the genetic algorithm
+    for g in range(NGEN):
+        # Select the next generation individuals
+        offspring = toolbox.select(pop, len(pop))
+        # Clone the selected individuals
+        offspring = [toolbox.clone(ind) for ind in offspring]
 
-for g in range(NGEN):
-    # Select the next generation individuals
-    offspring = toolbox.select(pop, len(pop))
-    # Clone the selected individuals
-    offspring = [toolbox.clone(ind) for ind in offspring]
+        # Apply crossover on the offspring
+        for child1, child2 in zip(offspring[::2], offspring[1::2]):
+            if random.random() < CXPB:
+                toolbox.mate(child1, child2)
+                del child1.fitness.values
+                del child2.fitness.values
 
-    # Apply crossover on the offspring
-    for child1, child2 in zip(offspring[::2], offspring[1::2]):
-        if random.random() < CXPB:
-            toolbox.mate(child1, child2)
-            del child1.fitness.values
-            del child2.fitness.values
+        # Apply mutation on the offspring
+        for mutant in offspring:
+            if random.random() < MUTPB:
+                toolbox.mutate(mutant)
+                del mutant.fitness.values
 
-    # Apply mutation on the offspring
-    for mutant in offspring:
-        if random.random() < MUTPB:
-            toolbox.mutate(mutant)
-            del mutant.fitness.values
+        # Evaluate the individuals with an invalid fitness
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
+            ind.fitness.values = fit
 
-    # Evaluate the individuals with an invalid fitness
-    invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-    fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
-    for ind, fit in zip(invalid_ind, fitnesses):
-        ind.fitness.values = fit
+        # The population is entirely replaced by the offspring
+        pop[:] = offspring
 
-    # The population is entirely replaced by the offspring
-    pop[:] = offspring
+        # Recording statistics
+        record = mstats.compile(pop)
+        logbook.record(gen=g, evals=len(invalid_ind), **record)
 
-    # Recording statistics
-    record = mstats.compile(pop)
-    logbook.record(gen=g, evals=len(invalid_ind), **record)
+    # logbook.header = "gen", "evals", "avg", "min", "max"
+    # print(logbook)
 
-# logbook.header = "gen", "evals", "avg", "min", "max"
-# print(logbook)
+    gen = logbook.select("gen")
+    fit_mins = logbook.chapters["cost"].select("min")
+    duration_mins = logbook.chapters["duration"].select("min")
+    duration_maxs = logbook.chapters["duration"].select("max")
+    fit_avg = logbook.chapters["cost"].select("avg")
 
-gen = logbook.select("gen")
-fit_mins = logbook.chapters["cost"].select("min")
-duration_mins = logbook.chapters["duration"].select("min")
-duration_maxs = logbook.chapters["duration"].select("max")
-fit_avg = logbook.chapters["cost"].select("avg")
+    fig, ax1 = plt.subplots()
+    line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Cost")
+    line3 = ax1.plot(gen, fit_avg, "g-", label= "Average Cost")
+    ax1.set_xlabel("Generation")
+    ax1.set_ylabel("Cost", color="b")
+    for tl in ax1.get_yticklabels():
+        tl.set_color("b")
 
-fig, ax1 = plt.subplots()
-line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Cost")
-line3 = ax1.plot(gen, fit_avg, "g-", label= "Average Cost")
-ax1.set_xlabel("Generation")
-ax1.set_ylabel("Cost", color="b")
-for tl in ax1.get_yticklabels():
-    tl.set_color("b")
+    ax2 = ax1.twinx()
+    line2 = ax2.plot(gen, duration_mins, "r-", label="Minimum Duration")
+    line4 = ax2.plot(gen, duration_maxs, "y-", label="Maximum Duration")
+    ax2.set_ylabel("Duration", color="r")
+    for tl in ax2.get_yticklabels():
+        tl.set_color("r")
 
-ax2 = ax1.twinx()
-line2 = ax2.plot(gen, duration_mins, "r-", label="Minimum Duration")
-line4 = ax2.plot(gen, duration_maxs, "y-", label="Maximum Duration")
-ax2.set_ylabel("Duration", color="r")
-for tl in ax2.get_yticklabels():
-    tl.set_color("r")
+    lns = line1 + line2 + line3 + line4
+    labs = [l.get_label() for l in lns]
+    ax1.legend(lns, labs, loc="center right")
 
-lns = line1 + line2 + line3 + line4
-labs = [l.get_label() for l in lns]
-ax1.legend(lns, labs, loc="center right")
+    plt.show()
 
-plt.show()
+if __name__ == "__main__":
+    genetic_algo()

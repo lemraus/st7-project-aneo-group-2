@@ -4,3 +4,6 @@
 
 # Large data files
 src/data/large*.json
+
+# Cache
+*/__pycache__
