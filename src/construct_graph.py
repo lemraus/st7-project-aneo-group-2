@@ -23,14 +23,14 @@ def construct_graph(filename):
         for key, value in data_dict["nodes"].items():
             try:
                 G.add_node(keys_indexes[key], data=parse_time(value["Data"]))
-            except:
+            except KeyError:
                 keys_indexes[key] = str(current_index)
                 G.add_node(str(current_index), data=parse_time(value["Data"]))
                 current_index += 1
             for other_key in value["Dependencies"]:
                 try:
                     G.add_edge(keys_indexes[str(other_key)], keys_indexes[key])
-                except:
+                except KeyError:
                     G.add_edge(str(current_index), keys_indexes[key])
                     keys_indexes[str(other_key)] = str(current_index)
                     current_index += 1
