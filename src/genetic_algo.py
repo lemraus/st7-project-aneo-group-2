@@ -3,12 +3,13 @@ import random
 import matplotlib.pyplot as plt
 import numpy
 from deap import creator, base, tools
-from scoop import futures
+# from scoop import futures
 
 from cost_func import cost_func as evaluate
 from crossover import crossover_in_place as mate
 from mutate import mutate_in_place as mutate
-from schedule_generator import init_generation, makeGraph
+from schedule_generator import init_generation
+from construct_graph import construct_graph
 
 # Creating abstract fitness function, with two objective minimizer
 creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
@@ -17,16 +18,16 @@ creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
 # Initializing variables
-NB_POP, MAX_MACH = 50, 50
-MACHINES_MUTATION_PROBABILITY = 0.2
-MUTATION_PROBABILITY = 0.1
+NB_POP, MAX_MACH = 200, 50
+MACHINES_MUTATION_PROBABILITY = 0.3
+MUTATION_PROBABILITY = 0.2
 CXPB = 0.5
 MUTPB = 0.5
-NGEN = 20
+NGEN = 40
 
 # Let us build the graph only once in order to save time
 graph_name = "mediumRandom"
-task_graph = makeGraph(graph_name)
+task_graph = construct_graph(graph_name)
 
 
 def initChromosome(icls, content):
@@ -48,7 +49,7 @@ def initPopulation(pcls, ind_init, filename):
 
 # Creating and registering toolbox
 toolbox = base.Toolbox()
-toolbox.register("map", futures.map)
+# toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY)
@@ -133,7 +134,7 @@ def genetic_algo():
 
     lns = line1 + line2 + line3 + line4
     labs = [l.get_label() for l in lns]
-    ax1.legend(lns, labs, loc="center right")
+    ax1.legend(lns, labs, loc="upper right")
 
     plt.show()
 
