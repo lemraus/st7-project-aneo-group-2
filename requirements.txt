@@ -1,4 +1,13 @@
-matplotlib
+cycler==0.10.0
 deap==1.3.1
 decorator==4.4.2
+greenlet==0.4.15
+kiwisolver==1.1.0
+matplotlib==3.1.3
 networkx==2.4
+numpy==1.18.1
+pyparsing==2.4.6
+python-dateutil==2.8.1
+pyzmq==19.0.0
+scoop==0.7.1.1
+six==1.14.0
