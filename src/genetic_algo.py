@@ -123,7 +123,7 @@ def multiple_runs_mean(nb_experiments):
     generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
     for _ in range(nb_experiments):
-        gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo(MAXIMUM_DURATION)
+        gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo()
         if generations == None: 
             generations = gen
         all_fit_mins.append(fit_mins)
@@ -166,4 +166,4 @@ def plot_runs_mean(runs_results):
     plt.show()
 
 if __name__ == "__main__":
-    plot_runs_mean(multiple_runs_mean(10))
+    plot_runs_mean(multiple_runs_mean(1))
