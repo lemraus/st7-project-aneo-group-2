@@ -119,10 +119,10 @@ def genetic_algo():
 
     return gen, fit_mins, fit_avg, duration_mins, duration_maxs
 
-def multiple_runs_mean(nb_experiments):
+def multiple_runs_mean(nb_runs):
     generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
-    for _ in range(nb_experiments):
+    for _ in range(nb_runs):
         gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo()
         if generations == None: 
             generations = gen
@@ -132,19 +132,19 @@ def multiple_runs_mean(nb_experiments):
         all_duration_maxs.append(duration_maxs)
 
     def mean_values(all_values):
-        return [sum(x) / nb_experiments for x in zip(*all_values)]
+        return [sum(x) / nb_runs for x in zip(*all_values)]
 
     mean_fit_mins = mean_values(all_fit_mins)
     mean_fit_avg = mean_values(all_fit_avg)
     mean_duration_mins = mean_values(all_duration_mins)
     mean_duration_maxs = mean_values(all_duration_maxs)
 
-    return nb_experiments, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
+    return nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
 
 def plot_runs_mean(runs_results):
-    nb_experiments, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
+    nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
     fig, ax1 = plt.subplots()
-    fig.suptitle(f"Mean results over {nb_experiments} runs (max duration: {MAXIMUM_DURATION})")
+    fig.suptitle(f"Mean results over {nb_runs} runs (max duration: {MAXIMUM_DURATION})")
     line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
     line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
     ax1.set_xlabel("Generation")
