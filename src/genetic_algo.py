@@ -54,7 +54,6 @@ toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
-toolbox.register("evaluate", evaluate, task_graph)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 # Creating and registering stats
@@ -67,7 +66,8 @@ mstats.register("min", numpy.min)
 mstats.register("avg", numpy.average)
 mstats.register("max", numpy.max)
 
-def genetic_algo():
+def genetic_algo(max_duration):
+    toolbox.register("evaluate", evaluate, task_graph, max_duration=max_duration)
     # Creating the population
     pop = toolbox.population_guess()
 
@@ -117,17 +117,44 @@ def genetic_algo():
     duration_maxs = logbook.chapters["duration"].select("max")
     fit_avg = logbook.chapters["cost"].select("avg")
 
+    return gen, fit_mins, fit_avg, duration_mins, duration_maxs
+
+def multiple_runs_mean(nb_experiments, max_duration):
+    generations = None
+    all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
+    for _ in range(nb_experiments):
+        gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo(max_duration)
+        if generations == None: 
+            generations = gen
+        all_fit_mins.append(fit_mins)
+        all_fit_avg.append(fit_avg)
+        all_duration_mins.append(duration_mins)
+        all_duration_maxs.append(duration_maxs)
+
+    def mean_values(all_values):
+        return [sum(x) / nb_experiments for x in zip(*all_values)]
+
+    mean_fit_mins = mean_values(all_fit_mins)
+    mean_fit_avg = mean_values(all_fit_avg)
+    mean_duration_mins = mean_values(all_duration_mins)
+    mean_duration_maxs = mean_values(all_duration_maxs)
+
+    return nb_experiments, max_duration, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
+
+def plot_runs_mean(runs_results):
+    nb_experiments, max_duration, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
     fig, ax1 = plt.subplots()
-    line1 = ax1.plot(gen, fit_mins, "b-", label="Minimum Cost")
-    line3 = ax1.plot(gen, fit_avg, "g-", label= "Average Cost")
+    fig.suptitle(f"Mean results over {nb_experiments} runs (max duration: {max_duration})")
+    line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
+    line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
     ax1.set_xlabel("Generation")
     ax1.set_ylabel("Cost", color="b")
     for tl in ax1.get_yticklabels():
         tl.set_color("b")
 
     ax2 = ax1.twinx()
-    line2 = ax2.plot(gen, duration_mins, "r-", label="Minimum Duration")
-    line4 = ax2.plot(gen, duration_maxs, "y-", label="Maximum Duration")
+    line2 = ax2.plot(generations, mean_duration_mins, "r-", label="Minimum Duration")
+    line4 = ax2.plot(generations, mean_duration_maxs, "y-", label="Maximum Duration")
     ax2.set_ylabel("Duration", color="r")
     for tl in ax2.get_yticklabels():
         tl.set_color("r")
@@ -139,4 +166,4 @@ def genetic_algo():
     plt.show()
 
 if __name__ == "__main__":
-    genetic_algo()
+    plot_runs_mean(multiple_runs_mean(10, 30000))

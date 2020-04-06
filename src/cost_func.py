@@ -1,11 +1,10 @@
-def cost_func(graph, array):
+def cost_func(graph, array, /, max_duration):
     total_cost = 0
 
     # Params
     COST = 0.1  # Cost per second
     BOOTING_TIME = 20
     PENALTY_MULTIPLIER = 2
-    MAXIMUM_DURATION = 2000000  # TODO : must bring this down depending on the graph!
 
     # Array of finishing times of the last task of a given machine
     time_machine = [0] * len(array)
@@ -36,6 +35,6 @@ def cost_func(graph, array):
         # print(f'Tâche {task}: coût de {total_cost}.')
 
     total_duration = max(time_machine)
-    if total_duration > MAXIMUM_DURATION:
+    if total_duration > max_duration:
         total_cost *= PENALTY_MULTIPLIER
     return (total_cost, total_duration)
