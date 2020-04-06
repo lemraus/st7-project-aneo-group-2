@@ -26,7 +26,7 @@ MUTPB = 0.5
 NGEN = 50
 
 # Let us build the graph only once in order to save time
-graph_name = "smallRandom"
+graph_name = "MediumComplex"
 task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
 
 
@@ -54,7 +54,7 @@ toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
-toolbox.register("evaluate", evaluate, task_graph, max_duration=MAXIMUM_DURATION, max_mach=MAX_MACH)
+toolbox.register("evaluate", evaluate, task_graph, max_duration=MAXIMUM_DURATION)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 # Creating and registering stats
@@ -123,7 +123,7 @@ def multiple_runs_mean(nb_experiments):
     generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
     for _ in range(nb_experiments):
-        gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo(max_duration)
+        gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo(MAXIMUM_DURATION)
         if generations == None: 
             generations = gen
         all_fit_mins.append(fit_mins)
@@ -166,4 +166,4 @@ def plot_runs_mean(runs_results):
     plt.show()
 
 if __name__ == "__main__":
-    plot_runs_mean(multiple_runs_mean(10, 30000))
+    plot_runs_mean(multiple_runs_mean(10))

@@ -16,10 +16,11 @@ def json_data_file(name):
 
 def construct_graph(filename):
     G = nx.DiGraph()
-    current_index = 0
+    current_index = 1
     keys_indexes = {}
     maximum_duration = 0
 
+    G.add_node('0', data=0)
     with open(json_data_file(filename)) as json_file:
         data_dict = json.load(json_file)
         for key, value in data_dict["nodes"].items():
@@ -31,19 +32,25 @@ def construct_graph(filename):
                 keys_indexes[key] = str(current_index)
                 current_index += 1
                 maximum_duration += parse_time(value["Data"])
-            for other_key in value["Dependencies"]:
-                try:
-                    G.add_edge(keys_indexes[str(other_key)], keys_indexes[key])
-                except KeyError:
-                    G.add_edge(str(current_index), keys_indexes[key])
-                    keys_indexes[str(other_key)] = str(current_index)
-                    current_index += 1
-                    maximum_duration += parse_time(value["Data"])
+            if value["Dependencies"]:
+                for other_key in value["Dependencies"]:
+                    try:
+                        G.add_edge(keys_indexes[str(other_key)], keys_indexes[key])
+                    except KeyError:
+                        G.add_edge(str(current_index), keys_indexes[key])
+                        keys_indexes[str(other_key)] = str(current_index)
+                        current_index += 1
+                        maximum_duration += parse_time(value["Data"])
+            else:
+                G.add_edge('0', keys_indexes[key])
 
     print(f"Longest path: {nx.algorithms.dag.dag_longest_path(G)}")
     print(f"Length of the longest path: {nx.algorithms.dag.dag_longest_path_length(G)}")
 
-    return G, 0.5*maximum_duration
+    return G, 0.1*maximum_duration
 
 if __name__ == "__main__":
-    G, _ = construct_graph("smallRandom")
+    G, _ = construct_graph("MediumComplex")
+    nx.draw_kamada_kawai(G, with_labels=True)
+    plt.draw()
+    plt.show()
