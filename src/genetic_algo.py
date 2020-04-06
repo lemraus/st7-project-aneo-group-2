@@ -23,7 +23,7 @@ MACHINES_MUTATION_PROBABILITY = 0.3
 MUTATION_PROBABILITY = 0.2
 CXPB = 0.5
 MUTPB = 0.5
-NGEN = 50
+NGEN = 30
 
 
 def initChromosome(icls, content):
@@ -166,7 +166,7 @@ def plot_runs_mean(runs_results):
 
 if __name__ == "__main__":
     # Initializing the graph and the shared constants
-    graph_name = "mediumRandom"
+    graph_name = "MediumComplex"
     task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
     shared.setConst(graph_name=graph_name, graph=task_graph, max_duration=MAXIMUM_DURATION)
 
