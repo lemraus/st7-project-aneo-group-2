@@ -162,7 +162,7 @@ def plot_runs_mean(runs_results):
     labs = [l.get_label() for l in lns]
     ax1.legend(lns, labs, loc="upper right")
 
-    plt.show()
+    plt.savefig(f"{graph_name}_{nb_runs}_runs.png")
 
 if __name__ == "__main__":
     # Initializing the graph and the shared constants
@@ -170,4 +170,4 @@ if __name__ == "__main__":
     task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
     shared.setConst(graph_name=graph_name, graph=task_graph, max_duration=MAXIMUM_DURATION)
 
-    plot_runs_mean(multiple_runs_mean(10))
+    plot_runs_mean(multiple_runs_mean(1))
