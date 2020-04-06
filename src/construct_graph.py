@@ -26,6 +26,7 @@ def construct_graph(filename):
             try:
                 G.add_node(keys_indexes[key], data=parse_time(value["Data"]))
             except KeyError:
+                keys_indexes[key] = str(current_index)
                 G.add_node(str(current_index), data=parse_time(value["Data"]))
                 keys_indexes[key] = str(current_index)
                 current_index += 1

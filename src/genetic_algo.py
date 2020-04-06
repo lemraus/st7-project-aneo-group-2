@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy
 from deap import creator, base, tools
-# from scoop import futures
+from scoop import futures
 
 from cost_func import cost_func as evaluate
 from crossover import crossover_in_place as mate
@@ -18,12 +18,12 @@ creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
 creator.create("Individual", list, fitness=creator.FitnessMin)
 
 # Initializing variables
-NB_POP, MAX_MACH = 200, 50
+NB_POP, MAX_MACH = 50, 50
 MACHINES_MUTATION_PROBABILITY = 0.3
 MUTATION_PROBABILITY = 0.2
 CXPB = 0.5
 MUTPB = 0.5
-NGEN = 40
+NGEN = 50
 
 # Let us build the graph only once in order to save time
 graph_name = "smallRandom"
@@ -49,7 +49,7 @@ def initPopulation(pcls, ind_init, filename):
 
 # Creating and registering toolbox
 toolbox = base.Toolbox()
-# toolbox.register("map", futures.map)
+toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
