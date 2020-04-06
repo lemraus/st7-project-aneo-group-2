@@ -32,21 +32,21 @@ def initChromosome(icls, content):
     return icls(content)
 
 
-def initPopulation(pcls, ind_init, filename):
+def initPopulation(pcls, ind_init):
     """
     pcls : class of the population (i.e. a toolbox attribute of an individual)
     ind_init : function to initialize individuals
-    filename : the name of the graph file we want to use (for now use only smallRandom or mediumRandom)
 
     return : a list of individuals
     """
-    contents = init_generation(NB_POP, MAX_MACH, task_graph)
+    graph = shared.getConst("graph")
+    contents = init_generation(NB_POP, MAX_MACH, graph)
     return pcls(ind_init(c) for c in contents)
 
 
 # Creating and registering toolbox
 toolbox = base.Toolbox()
-toolbox.register("map", futures.map)
+# toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
@@ -68,7 +68,7 @@ def genetic_algo():
     graph = shared.getConst("graph")
     max_duration = shared.getConst("max_duration")
     # Extra toolbox registers
-    toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
+    toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess)
     toolbox.register("evaluate", evaluate, graph, max_duration=max_duration)
     # Creating the population
     pop = toolbox.population_guess()
@@ -99,7 +99,7 @@ def genetic_algo():
 
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        fitnesses = map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
@@ -118,17 +118,25 @@ def genetic_algo():
 
     return gen, fit_mins, fit_avg, duration_mins, duration_maxs
 
+def single_run(index):
+    print(f"Starting run n°{index}...")
+    result = genetic_algo()
+    print(f"Finished run n°{index}.")
+    return result
+
 @timer
 def multiple_runs_mean(nb_runs):
+    generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
-    for n in range(nb_runs):
-        print(f"Starting run n°{n+1}...")
-        gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo()
+
+    runs_results = futures.map(single_run, range(1, nb_runs + 1))
+    for gen, fit_mins, fit_avg, duration_mins, duration_maxs in runs_results:
+        if generations == None:
+            generations = gen
         all_fit_mins.append(fit_mins)
         all_fit_avg.append(fit_avg)
         all_duration_mins.append(duration_mins)
         all_duration_maxs.append(duration_maxs)
-        print(f"Finished run n°{n+1}.")
 
     def mean_values(all_values):
         return [sum(x) / nb_runs for x in zip(*all_values)]
@@ -138,24 +146,24 @@ def multiple_runs_mean(nb_runs):
     mean_duration_mins = mean_values(all_duration_mins)
     mean_duration_maxs = mean_values(all_duration_maxs)
 
-    return nb_runs, gen, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
+    return nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
 
 def plot_runs_mean(runs_results):
     graph_name = shared.getConst("graph_name")
     max_duration = shared.getConst("max_duration")
-    nb_runs, gen, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
+    nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
     fig, ax1 = plt.subplots()
     fig.suptitle(f"Mean results over {nb_runs} runs, graph: '{graph_name}', duration constraint: {max_duration}")
-    line1 = ax1.plot(gen, mean_fit_mins, "b-", label="Minimum Cost")
-    line3 = ax1.plot(gen, mean_fit_avg, "g-", label= "Average Cost")
+    line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
+    line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
     ax1.set_xlabel("Generation")
     ax1.set_ylabel("Cost", color="b")
     for tl in ax1.get_yticklabels():
         tl.set_color("b")
 
     ax2 = ax1.twinx()
-    line2 = ax2.plot(gen, mean_duration_mins, "r-", label="Minimum Duration")
-    line4 = ax2.plot(gen, mean_duration_maxs, "y-", label="Maximum Duration")
+    line2 = ax2.plot(generations, mean_duration_mins, "r-", label="Minimum Duration")
+    line4 = ax2.plot(generations, mean_duration_maxs, "y-", label="Maximum Duration")
     ax2.set_ylabel("Duration", color="r")
     for tl in ax2.get_yticklabels():
         tl.set_color("r")
@@ -171,4 +179,4 @@ if __name__ == "__main__":
     task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
     shared.setConst(graph_name=graph_name, graph=task_graph, max_duration=MAXIMUM_DURATION)
 
-    plot_runs_mean(multiple_runs_mean(10))
+    plot_runs_mean(multiple_runs_mean(16))
