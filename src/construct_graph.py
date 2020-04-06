@@ -29,7 +29,7 @@ def construct_graph(filename):
                 current_index += 1
             for other_key in value["Dependencies"]:
                 try:
-                    G.add_edge(keys_indexes[str(other_key)], str(current_index))
+                    G.add_edge(keys_indexes[str(other_key)], keys_indexes[key])
                 except:
                     G.add_edge(str(current_index), keys_indexes[key])
                     keys_indexes[str(other_key)] = str(current_index)
