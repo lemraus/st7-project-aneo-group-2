@@ -1,12 +1,11 @@
-def cost_func(graph, array):
+def cost_func(graph, array, MAXIMUM_DURATION):
     total_cost = 0
 
     # Params
-    COST = 0.1  # Cost per second
-    BOOTING_TIME = 20
+    COST = 0.1/60  # Cost per second
+    BOOTING_TIME = 5*60
     PENALTY_MULTIPLIER = 2
-    MAXIMUM_DURATION = 2000000  # TODO : must bring this down depending on the graph!
-
+    
     # Array of finishing times of the last task of a given machine
     time_machine = [0] * len(array)
 
