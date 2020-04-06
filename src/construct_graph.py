@@ -44,9 +44,6 @@ def construct_graph(filename):
             else:
                 G.add_edge('0', keys_indexes[key])
 
-    print(f"Longest path: {nx.algorithms.dag.dag_longest_path(G)}")
-    print(f"Length of the longest path: {nx.algorithms.dag.dag_longest_path_length(G)}")
-
     return G, maximum_duration / 30
 
 if __name__ == "__main__":

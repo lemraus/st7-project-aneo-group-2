@@ -109,9 +109,6 @@ def genetic_algo():
         record = mstats.compile(pop)
         logbook.record(gen=g, evals=len(invalid_ind), **record)
 
-    # logbook.header = "gen", "evals", "avg", "min", "max"
-    # print(logbook)
-
     gen = logbook.select("gen")
     fit_mins = logbook.chapters["cost"].select("min")
     duration_mins = logbook.chapters["duration"].select("min")
@@ -121,12 +118,9 @@ def genetic_algo():
     return gen, fit_mins, fit_avg, duration_mins, duration_maxs
 
 def multiple_runs_mean(nb_runs):
-    generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
     for _ in range(nb_runs):
         gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo()
-        if generations == None: 
-            generations = gen
         all_fit_mins.append(fit_mins)
         all_fit_avg.append(fit_avg)
         all_duration_mins.append(duration_mins)
@@ -140,22 +134,24 @@ def multiple_runs_mean(nb_runs):
     mean_duration_mins = mean_values(all_duration_mins)
     mean_duration_maxs = mean_values(all_duration_maxs)
 
-    return nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
+    return nb_runs, gen, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
 
 def plot_runs_mean(runs_results):
-    nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
+    graph_name = shared.getConst("graph_name")
+    max_duration = shared.getConst("max_duration")
+    nb_runs, gen, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
     fig, ax1 = plt.subplots()
-    fig.suptitle(f"Mean results over {nb_runs} runs, graph: '{graph_name}', duration constraint: {MAXIMUM_DURATION}")
-    line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
-    line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
+    fig.suptitle(f"Mean results over {nb_runs} runs, graph: '{graph_name}', duration constraint: {max_duration}")
+    line1 = ax1.plot(gen, mean_fit_mins, "b-", label="Minimum Cost")
+    line3 = ax1.plot(gen, mean_fit_avg, "g-", label= "Average Cost")
     ax1.set_xlabel("Generation")
     ax1.set_ylabel("Cost", color="b")
     for tl in ax1.get_yticklabels():
         tl.set_color("b")
 
     ax2 = ax1.twinx()
-    line2 = ax2.plot(generations, mean_duration_mins, "r-", label="Minimum Duration")
-    line4 = ax2.plot(generations, mean_duration_maxs, "y-", label="Maximum Duration")
+    line2 = ax2.plot(gen, mean_duration_mins, "r-", label="Minimum Duration")
+    line4 = ax2.plot(gen, mean_duration_maxs, "y-", label="Maximum Duration")
     ax2.set_ylabel("Duration", color="r")
     for tl in ax2.get_yticklabels():
         tl.set_color("r")
