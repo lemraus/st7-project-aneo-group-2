@@ -10,6 +10,7 @@ from crossover import crossover_in_place as mate
 from mutate import mutate_in_place as mutate
 from schedule_generator import init_generation
 from construct_graph import construct_graph
+from timer import timer
 
 # Creating abstract fitness function, with two objective minimizer
 creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
@@ -117,6 +118,7 @@ def genetic_algo():
 
     return gen, fit_mins, fit_avg, duration_mins, duration_maxs
 
+@timer
 def multiple_runs_mean(nb_runs):
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
     for n in range(nb_runs):
