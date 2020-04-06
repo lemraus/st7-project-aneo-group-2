@@ -1,9 +1,0 @@
-# Editor/environment related files
-.vscode/
-.python-version
-
-# Large data files
-src/data/large*.json
-
-# Cache
-*/__pycache__
