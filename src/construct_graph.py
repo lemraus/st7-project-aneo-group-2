@@ -47,7 +47,7 @@ def construct_graph(filename):
     print(f"Longest path: {nx.algorithms.dag.dag_longest_path(G)}")
     print(f"Length of the longest path: {nx.algorithms.dag.dag_longest_path_length(G)}")
 
-    return G, 0.1*maximum_duration
+    return G, maximum_duration / 30
 
 if __name__ == "__main__":
     G, _ = construct_graph("MediumComplex")

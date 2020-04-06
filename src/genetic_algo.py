@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy
 from deap import creator, base, tools
-from scoop import futures
+from scoop import futures, shared
 
 from cost_func import cost_func as evaluate
 from crossover import crossover_in_place as mate
@@ -24,10 +24,6 @@ MUTATION_PROBABILITY = 0.2
 CXPB = 0.5
 MUTPB = 0.5
 NGEN = 50
-
-# Let us build the graph only once in order to save time
-graph_name = "MediumComplex"
-task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
 
 
 def initChromosome(icls, content):
@@ -51,10 +47,8 @@ def initPopulation(pcls, ind_init, filename):
 toolbox = base.Toolbox()
 toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
-toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
-toolbox.register("evaluate", evaluate, task_graph, max_duration=MAXIMUM_DURATION)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 # Creating and registering stats
@@ -68,6 +62,13 @@ mstats.register("avg", numpy.average)
 mstats.register("max", numpy.max)
 
 def genetic_algo():
+    # Shared constants
+    graph_name = shared.getConst("graph_name")
+    graph = shared.getConst("graph")
+    max_duration = shared.getConst("max_duration")
+    # Extra toolbox registers
+    toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
+    toolbox.register("evaluate", evaluate, graph, max_duration=max_duration)
     # Creating the population
     pop = toolbox.population_guess()
 
@@ -144,7 +145,7 @@ def multiple_runs_mean(nb_runs):
 def plot_runs_mean(runs_results):
     nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
     fig, ax1 = plt.subplots()
-    fig.suptitle(f"Mean results over {nb_runs} runs (max duration: {MAXIMUM_DURATION})")
+    fig.suptitle(f"Mean results over {nb_runs} runs, graph: '{graph_name}', duration constraint: {MAXIMUM_DURATION}")
     line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
     line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
     ax1.set_xlabel("Generation")
@@ -166,4 +167,9 @@ def plot_runs_mean(runs_results):
     plt.show()
 
 if __name__ == "__main__":
+    # Initializing the graph and the shared constants
+    graph_name = "MediumComplex"
+    task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
+    shared.setConst(graph_name=graph_name, graph=task_graph, max_duration=MAXIMUM_DURATION)
+
     plot_runs_mean(multiple_runs_mean(1))
