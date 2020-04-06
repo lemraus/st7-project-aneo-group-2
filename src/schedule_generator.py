@@ -56,7 +56,7 @@ def init_generation(nb_chrm, max_machine, graph):
 
 
 if __name__ == "__main__":
-    G = construct_graph("smallRandom")
+    G, _ = construct_graph("smallRandom")
     nx.draw_kamada_kawai(G, with_labels=True)
     plt.draw()
     plt.show()

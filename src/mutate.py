@@ -27,15 +27,14 @@ from random import random, randint
 #
 
 
-def mutate_in_place(MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY, chromosome):
+def mutate_in_place(MUTATION_PROBABILITY, chromosome):
     max_machines = max(map(lambda x: x[1], chromosome))
 
-    # If we apply this mutation then we either gain a machine or lose one.
-    if random() < MACHINES_MUTATION_PROBABILITY:
-        if random() < 0.5 or max_machines == 0:
-            max_machines += 1
-        else:
-            max_machines -= 1
+    # During a mutation we either gain a machine or lose one.
+    if random() < 0.5 or max_machines == 0:
+        max_machines += 1
+    else:
+        max_machines -= 1
 
     # To reorder the tasks on the new number of machines
     for i in range(len(chromosome)):

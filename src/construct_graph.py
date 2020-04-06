@@ -18,6 +18,8 @@ def construct_graph(filename):
     G = nx.DiGraph()
     current_index = 0
     keys_indexes = {}
+    maximum_duration = 0
+
     with open(json_data_file(filename)) as json_file:
         data_dict = json.load(json_file)
         for key, value in data_dict["nodes"].items():
@@ -26,7 +28,9 @@ def construct_graph(filename):
             except KeyError:
                 keys_indexes[key] = str(current_index)
                 G.add_node(str(current_index), data=parse_time(value["Data"]))
+                keys_indexes[key] = str(current_index)
                 current_index += 1
+                maximum_duration += parse_time(value["Data"])
             for other_key in value["Dependencies"]:
                 try:
                     G.add_edge(keys_indexes[str(other_key)], keys_indexes[key])
@@ -34,11 +38,12 @@ def construct_graph(filename):
                     G.add_edge(str(current_index), keys_indexes[key])
                     keys_indexes[str(other_key)] = str(current_index)
                     current_index += 1
+                    maximum_duration += parse_time(value["Data"])
 
     print(f"Longest path: {nx.algorithms.dag.dag_longest_path(G)}")
     print(f"Length of the longest path: {nx.algorithms.dag.dag_longest_path_length(G)}")
 
-    return G
+    return G, 0.5*maximum_duration
 
 if __name__ == "__main__":
-    construct_graph("mediumRandom")
+    G, _ = construct_graph("smallRandom")

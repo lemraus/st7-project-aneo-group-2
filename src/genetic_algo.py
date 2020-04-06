@@ -26,8 +26,8 @@ MUTPB = 0.5
 NGEN = 50
 
 # Let us build the graph only once in order to save time
-graph_name = "mediumRandom"
-task_graph = construct_graph(graph_name)
+graph_name = "smallRandom"
+task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
 
 
 def initChromosome(icls, content):
@@ -52,8 +52,9 @@ toolbox = base.Toolbox()
 toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
-toolbox.register("mutate", mutate, MUTATION_PROBABILITY, MACHINES_MUTATION_PROBABILITY)
+toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
+toolbox.register("evaluate", evaluate, task_graph, max_duration=MAXIMUM_DURATION, max_mach=MAX_MACH)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 # Creating and registering stats
@@ -66,8 +67,7 @@ mstats.register("min", numpy.min)
 mstats.register("avg", numpy.average)
 mstats.register("max", numpy.max)
 
-def genetic_algo(max_duration):
-    toolbox.register("evaluate", evaluate, task_graph, max_duration=max_duration)
+def genetic_algo():
     # Creating the population
     pop = toolbox.population_guess()
 
@@ -119,7 +119,7 @@ def genetic_algo(max_duration):
 
     return gen, fit_mins, fit_avg, duration_mins, duration_maxs
 
-def multiple_runs_mean(nb_experiments, max_duration):
+def multiple_runs_mean(nb_experiments):
     generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
     for _ in range(nb_experiments):
@@ -139,12 +139,12 @@ def multiple_runs_mean(nb_experiments, max_duration):
     mean_duration_mins = mean_values(all_duration_mins)
     mean_duration_maxs = mean_values(all_duration_maxs)
 
-    return nb_experiments, max_duration, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
+    return nb_experiments, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
 
 def plot_runs_mean(runs_results):
-    nb_experiments, max_duration, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
+    nb_experiments, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
     fig, ax1 = plt.subplots()
-    fig.suptitle(f"Mean results over {nb_experiments} runs (max duration: {max_duration})")
+    fig.suptitle(f"Mean results over {nb_experiments} runs (max duration: {MAXIMUM_DURATION})")
     line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
     line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
     ax1.set_xlabel("Generation")

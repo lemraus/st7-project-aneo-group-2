@@ -1,13 +1,12 @@
-def cost_func(graph, array, /, max_duration):
+def cost_func(graph, array, /, max_duration, max_mach):
     total_cost = 0
 
     # Params
-    COST = 0.1  # Cost per second
-    BOOTING_TIME = 20
+    COST = 0.1/60  # Cost per second
+    BOOTING_TIME = 5*60
     PENALTY_MULTIPLIER = 2
-
     # Array of finishing times of the last task of a given machine
-    time_machine = [0] * len(array)
+    time_machine = [0] * max_mach
 
     # Array of finishing time of a given task
     time_task = [0] * len(array)
@@ -29,7 +28,6 @@ def cost_func(graph, array, /, max_duration):
                 time_task[int(task)] += BOOTING_TIME
         elif starting_time - last_task_ending_time > BOOTING_TIME:  # We have to reboot the machine
             total_cost += COST * (BOOTING_TIME + duration)
-            # TODO : figure this part out with Mathis, I believe this brings up the cost a lot!!
         else:  # The machine stays on
             total_cost += COST * (finishing_time - last_task_ending_time)
         # print(f'Tâche {task}: coût de {total_cost}.')
