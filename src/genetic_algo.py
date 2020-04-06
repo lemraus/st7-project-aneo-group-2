@@ -119,12 +119,14 @@ def genetic_algo():
 
 def multiple_runs_mean(nb_runs):
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
-    for _ in range(nb_runs):
+    for n in range(nb_runs):
+        print(f"Starting run n°{n+1}...")
         gen, fit_mins, fit_avg, duration_mins, duration_maxs = genetic_algo()
         all_fit_mins.append(fit_mins)
         all_fit_avg.append(fit_avg)
         all_duration_mins.append(duration_mins)
         all_duration_maxs.append(duration_maxs)
+        print(f"Finished run n°{n+1}.")
 
     def mean_values(all_values):
         return [sum(x) / nb_runs for x in zip(*all_values)]
@@ -164,8 +166,8 @@ def plot_runs_mean(runs_results):
 
 if __name__ == "__main__":
     # Initializing the graph and the shared constants
-    graph_name = "MediumComplex"
+    graph_name = "mediumRandom"
     task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
     shared.setConst(graph_name=graph_name, graph=task_graph, max_duration=MAXIMUM_DURATION)
 
-    plot_runs_mean(multiple_runs_mean(1))
+    plot_runs_mean(multiple_runs_mean(10))
