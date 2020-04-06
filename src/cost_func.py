@@ -1,4 +1,4 @@
-def cost_func(graph, array, MAXIMUM_DURATION, MAX_MACH):
+def cost_func(graph, array, MAXIMUM_DURATION):
     total_cost = 0
 
     # Params
@@ -6,8 +6,9 @@ def cost_func(graph, array, MAXIMUM_DURATION, MAX_MACH):
     BOOTING_TIME = 5*60
     PENALTY_MULTIPLIER = 2
     
+    machines_number = max(map(lambda x: x[1], array))
     # Array of finishing times of the last task of a given machine
-    time_machine = [0] * MAX_MACH
+    time_machine = [0] * (machines_number + 1)
 
     # Array of finishing time of a given task
     time_task = [0] * len(array)

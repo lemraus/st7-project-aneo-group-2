@@ -26,7 +26,7 @@ MUTPB = 0.5
 NGEN = 50
 
 # Let us build the graph only once in order to save time
-graph_name = "smallRandom"
+graph_name = "MediumComplex"
 task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
 
 
@@ -54,7 +54,7 @@ toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess, graph_name)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
-toolbox.register("evaluate", evaluate, task_graph, MAXIMUM_DURATION=MAXIMUM_DURATION, MAX_MACH=MAX_MACH)
+toolbox.register("evaluate", evaluate, task_graph, MAXIMUM_DURATION=MAXIMUM_DURATION)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 # Creating and registering stats
