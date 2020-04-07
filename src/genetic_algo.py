@@ -47,7 +47,7 @@ def initPopulation(pcls, ind_init):
 
 # Creating and registering toolbox
 toolbox = base.Toolbox()
-# toolbox.register("map", futures.map)
+toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
 toolbox.register("mate", mate)
@@ -100,7 +100,7 @@ def genetic_algo():
 
         # Evaluate the individuals with an invalid fitness
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-        fitnesses = map(toolbox.evaluate, invalid_ind)
+        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
         for ind, fit in zip(invalid_ind, fitnesses):
             ind.fitness.values = fit
 
@@ -130,8 +130,10 @@ def multiple_runs_mean(nb_runs):
     generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
 
-    runs_results = futures.map(single_run, range(1, nb_runs + 1))
-    for gen, fit_mins, fit_avg, duration_mins, duration_maxs in runs_results:
+    # runs_results = futures.map(single_run, range(1, nb_runs + 1))
+    # for gen, fit_mins, fit_avg, duration_mins, duration_maxs in runs_results:
+    for i in range(1, nb_runs + 1):
+        gen, fit_mins, fit_avg, duration_mins, duration_maxs = single_run(i)
         if generations == None:
             generations = gen
         all_fit_mins.append(fit_mins)
