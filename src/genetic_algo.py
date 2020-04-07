@@ -149,38 +149,37 @@ def multiple_runs_mean(nb_runs):
 
     return nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs
 
-# def plot_runs_mean(runs_results):
-#     graph_name = shared.getConst("graph_name")
-#     max_duration = shared.getConst("max_duration")
-#     nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
-#     fig, ax1 = plt.subplots()
-#     fig.suptitle(f"Mean results over {nb_runs} runs, graph: '{graph_name}', duration constraint: {max_duration}")
-#     line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
-#     line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
-#     ax1.set_xlabel("Generation")
-#     ax1.set_ylabel("Cost", color="b")
-#     for tl in ax1.get_yticklabels():
-#         tl.set_color("b")
+def plot_runs_mean(runs_results):
+    graph_name = shared.getConst("graph_name")
+    max_duration = shared.getConst("max_duration")
+    nb_runs, generations, mean_fit_mins, mean_fit_avg, mean_duration_mins, mean_duration_maxs = runs_results
+    fig, ax1 = plt.subplots()
+    fig.suptitle(f"Mean results over {nb_runs} runs, graph: '{graph_name}', duration constraint: {max_duration}")
+    line1 = ax1.plot(generations, mean_fit_mins, "b-", label="Minimum Cost")
+    line3 = ax1.plot(generations, mean_fit_avg, "g-", label= "Average Cost")
+    ax1.set_xlabel("Generation")
+    ax1.set_ylabel("Cost", color="b")
+    for tl in ax1.get_yticklabels():
+        tl.set_color("b")
 
-#     ax2 = ax1.twinx()
-#     line2 = ax2.plot(generations, mean_duration_mins, "r-", label="Minimum Duration")
-#     line4 = ax2.plot(generations, mean_duration_maxs, "y-", label="Maximum Duration")
-#     ax2.set_ylabel("Duration", color="r")
-#     for tl in ax2.get_yticklabels():
-#         tl.set_color("r")
+    ax2 = ax1.twinx()
+    line2 = ax2.plot(generations, mean_duration_mins, "r-", label="Minimum Duration")
+    line4 = ax2.plot(generations, mean_duration_maxs, "y-", label="Maximum Duration")
+    ax2.set_ylabel("Duration", color="r")
+    for tl in ax2.get_yticklabels():
+        tl.set_color("r")
 
-#     lns = line1 + line2 + line3 + line4
-#     labs = [l.get_label() for l in lns]
-#     ax1.legend(lns, labs, loc="upper right")
+    lns = line1 + line2 + line3 + line4
+    labs = [l.get_label() for l in lns]
+    ax1.legend(lns, labs, loc="upper right")
 
-#     OUTPUT_DIR = os.environ.get("AZ_BATCH_TASK_DIR", ".")
-#     OUTPUT_FILE = os.path.join(OUTPUT_DIR, f"{graph_name}_{nb_runs}_runs.png")
-#     plt.savefig(OUTPUT_FILE)
+    OUTPUT_DIR = os.environ.get("AZ_BATCH_TASK_DIR", ".")
+    OUTPUT_FILE = os.path.join(OUTPUT_DIR, f"{graph_name}_{nb_runs}_runs.png")
+    plt.savefig(OUTPUT_FILE)
 
 if __name__ == "__main__":
     graph_name = "MediumComplex"
     task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
     shared.setConst(graph_name=graph_name, graph=task_graph, max_duration=MAXIMUM_DURATION)
 
-    # plot_runs_mean(multiple_runs_mean(16))
-    multiple_runs_mean(16)
+    plot_runs_mean(multiple_runs_mean(16))
