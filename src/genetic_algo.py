@@ -47,6 +47,7 @@ def initPopulation(pcls, ind_init):
 
 # Creating and registering toolbox
 toolbox = base.Toolbox()
+# The next line is for parallel evaluations. Comment it out when using parallel runs.
 # toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
@@ -130,8 +131,10 @@ def multiple_runs_mean(nb_runs):
     generations = None
     all_fit_mins, all_fit_avg, all_duration_mins, all_duration_maxs = [], [], [], []
 
+    # The next two lines are for sequential runs, comment them out when using parallel runs
     # for i in range(1, nb_runs + 1):
     #     gen, fit_mins, fit_avg, duration_mins, duration_maxs = single_run(i)
+    # The next two lines are for parallel runs, comment them out when using sequential runs
     runs_results = futures.map(single_run, range(1, nb_runs + 1))
     for gen, fit_mins, fit_avg, duration_mins, duration_maxs in runs_results:
         if generations == None:
