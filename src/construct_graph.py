@@ -20,13 +20,14 @@ def construct_graph(filename):
     keys_indexes = {}
     maximum_duration = 0
 
+    # Initial node so all tasks have at least one dependency
     G.add_node('0', data=0)
     with open(json_data_file(filename)) as json_file:
         data_dict = json.load(json_file)
         for key, value in data_dict["nodes"].items():
-            try:
+            try: # if an index has already been attributed to the task
                 G.add_node(keys_indexes[key], data=parse_time(value["Data"]))
-            except KeyError:
+            except KeyError: # else we attribute the task a new index to the task
                 keys_indexes[key] = str(current_index)
                 G.add_node(str(current_index), data=parse_time(value["Data"]))
                 keys_indexes[key] = str(current_index)
@@ -34,14 +35,14 @@ def construct_graph(filename):
                 maximum_duration += parse_time(value["Data"])
             if value["Dependencies"]:
                 for other_key in value["Dependencies"]:
-                    try:
+                    try: # if an index has already been attributed to the task
                         G.add_edge(keys_indexes[str(other_key)], keys_indexes[key])
-                    except KeyError:
+                    except KeyError: # else we attribute a new index to the task
                         G.add_edge(str(current_index), keys_indexes[key])
                         keys_indexes[str(other_key)] = str(current_index)
                         current_index += 1
                         maximum_duration += parse_time(value["Data"])
-            else:
+            else: # The task has no dependency
                 G.add_edge('0', keys_indexes[key])
 
     return G, maximum_duration / 30
