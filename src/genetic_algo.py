@@ -120,9 +120,9 @@ def genetic_algo():
     return gen, fit_mins, fit_avg, duration_mins, duration_maxs
 
 def single_run(index):
-    print(f"Starting run n°{index}...")
+    print(f"Starting run number {index}...")
     result = genetic_algo()
-    print(f"Finished run n°{index}.")
+    print(f"Finished run number {index}.")
     return result
 
 @timer
