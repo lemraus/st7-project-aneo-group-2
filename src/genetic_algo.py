@@ -182,4 +182,5 @@ if __name__ == "__main__":
     task_graph, MAXIMUM_DURATION = construct_graph(graph_name)
     shared.setConst(graph_name=graph_name, graph=task_graph, max_duration=MAXIMUM_DURATION)
 
-    plot_runs_mean(multiple_runs_mean(16))
+    # plot_runs_mean(multiple_runs_mean(16))
+    multiple_runs_mean(16)
