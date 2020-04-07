@@ -47,7 +47,6 @@ def initPopulation(pcls, ind_init):
 
 # Creating and registering toolbox
 toolbox = base.Toolbox()
-toolbox.register("map", map)
 # toolbox.register("map", futures.map)
 toolbox.register("individual_guess", initChromosome, creator.Individual)
 toolbox.register("mutate", mutate, MUTATION_PROBABILITY)
