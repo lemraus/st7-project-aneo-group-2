@@ -11,6 +11,7 @@ from mutate import mutate_in_place as mutate
 from schedule_generator import init_generation
 from construct_graph import construct_graph
 from timer import timer
+import os
 
 # Creating abstract fitness function, with two objective minimizer
 creator.create("FitnessMin", base.Fitness, weights=(-1.0, -1.0))
@@ -172,7 +173,9 @@ def plot_runs_mean(runs_results):
     labs = [l.get_label() for l in lns]
     ax1.legend(lns, labs, loc="upper right")
 
-    plt.savefig(f"{graph_name}_{nb_runs}_runs.png")
+    OUTPUT_DIR = os.environ.get("AZ_BATCH_TASK_DIR", ".")
+    OUTPUT_FILE = os.path.join(OUTPUT_DIR, f"{graph_name}_{nb_runs}_runs.png")
+    plt.savefig(OUTPUT_FILE)
 
 if __name__ == "__main__":
     graph_name = "MediumComplex"
