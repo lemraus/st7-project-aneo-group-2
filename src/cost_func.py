@@ -1,4 +1,4 @@
-def cost_func(graph, array, /, max_duration):
+def cost_func(graph, array, max_duration):
     total_cost = 0
 
     # Params
